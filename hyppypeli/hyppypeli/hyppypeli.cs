@@ -15,13 +15,18 @@ public class hyppypeli : PhysicsGame
 
     private PlatformCharacter pelaaja1;
 
-    private Image pelaajanKuva = LoadImage("tyyppi.png");
-                                           
+    private Image pelaajanKuva;
+
     private Image tahtiKuva = LoadImage("tahti.png");
     private Image estekuva = LoadImage("piikki.png");
-                                       
+
     private SoundEffect maaliAani = LoadSoundEffect("maali.wav");
-    
+
+    public hyppypeli()
+    {
+        pelaajanKuva = LoadImage("tyyppi.png");
+    }
+
     public override void Begin()
     {
         Gravity = new Vector(0, -1000);
@@ -46,16 +51,29 @@ public class hyppypeli : PhysicsGame
         kentta.Execute(RUUDUN_KOKO, RUUDUN_KOKO);
         Level.CreateBorders();
         Level.Background.CreateGradient(Color.White, Color.SkyBlue);
+        
     }
 
     private void LisaaEste(Vector paikka, double leveys, double korkeus)
     {
         PhysicsObject este = PhysicsObject.CreateStaticObject(leveys, korkeus);
+        este.Image = estekuva;
         este.Position = paikka;
-        este.Color = Color.Red;
+       AddCollisionHandler(este,TormasiEsteeseen);
+
         Add(este);
     }
 
+    private void TormasiEsteeseen(PhysicsObject tormaaja, PhysicsObject kohde)
+    {
+        kohde.Destroy();
+        kuolemaaani.Play();
+        ClearAll();
+        LuoKentta(); 
+        LisaaNappaimet();
+        Camera.Follow(pelaaja1);
+    }
+    SoundEffect kuolemaaani = LoadSoundEffect("super-mario-death-sound-sound-effect.wav");
     private void LisaaTaso(Vector paikka, double leveys, double korkeus)
     {
         PhysicsObject taso = PhysicsObject.CreateStaticObject(leveys, korkeus);
@@ -76,10 +94,12 @@ public class hyppypeli : PhysicsGame
 
     private void LisaaPelaaja(Vector paikka, double leveys, double korkeus)
     {
-        pelaaja1 = new PlatformCharacter(leveys, korkeus);
-        pelaaja1.Position = paikka;
-        pelaaja1.Mass = 4.0;
-        pelaaja1.Image = pelaajanKuva;
+        pelaaja1 = new PlatformCharacter(leveys, korkeus)
+        {
+            Position = paikka,
+            Mass = 4.0,
+            Image = pelaajanKuva
+        };
         AddCollisionHandler(pelaaja1, "tahti", TormaaTahteen);
         Add(pelaaja1);
     }
