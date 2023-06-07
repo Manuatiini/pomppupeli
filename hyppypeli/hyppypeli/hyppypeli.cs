@@ -16,7 +16,7 @@ public class hyppypeli : PhysicsGame
     private PlatformCharacter pelaaja1;
 
     private Image pelaajanKuva;
-
+    private Image morkokuva = LoadImage("mörkö.jifif"); 
     private Image tahtiKuva = LoadImage("tahti.png");
     private Image estekuva = LoadImage("piikki.png");
 
@@ -51,7 +51,7 @@ public class hyppypeli : PhysicsGame
         kentta.Execute(RUUDUN_KOKO, RUUDUN_KOKO);
         Level.CreateBorders();
         Level.Background.CreateGradient(Color.White, Color.SkyBlue);
-        
+
     }
 
     private void LisaaEste(Vector paikka, double leveys, double korkeus)
@@ -59,12 +59,17 @@ public class hyppypeli : PhysicsGame
         PhysicsObject este = PhysicsObject.CreateStaticObject(leveys, korkeus);
         este.Image = estekuva;
         este.Position = paikka;
-       AddCollisionHandler(este,TormasiEsteeseen);
+        AddCollisionHandler(este, TormasiEsteeseen);
 
         Add(este);
     }
+    {
+    PhysicsObject morko = new PhysicsObject(40, 20);
+    morko.Shape = morkokuva; 
+    morko.Color = Color.Black;
+}
 
-    private void TormasiEsteeseen(PhysicsObject tormaaja, PhysicsObject kohde)
+private void TormasiEsteeseen(PhysicsObject tormaaja, PhysicsObject kohde)
     {
         kohde.Destroy();
         kuolemaaani.Play();
