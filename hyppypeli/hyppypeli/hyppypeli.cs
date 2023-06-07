@@ -16,7 +16,7 @@ public class hyppypeli : PhysicsGame
     private PlatformCharacter pelaaja1;
 
     private Image pelaajanKuva;
-    private Image morkokuva = LoadImage("mörkö.jifif"); 
+    private Image morkokuva = LoadImage("mörkö.png");
     private Image tahtiKuva = LoadImage("tahti.png");
     private Image estekuva = LoadImage("piikki.png");
 
@@ -39,8 +39,31 @@ public class hyppypeli : PhysicsGame
         Camera.StayInLevel = true;
 
         MasterVolume = 0.5;
+
+
+
     }
 
+    void lisaamörkö(Vector paikka, double leveys, double korkeus) 
+    {PhysicsObject morko = new PhysicsObject(40, 20);
+        morko.Image = morkokuva;
+    Add(morko);
+    morko.Tag = "morko";
+    morko.Position = paikka; 
+    FollowerBrain seuraajanAivot = new FollowerBrain(pelaaja1);
+    seuraajanAivot.Speed = 150;
+    morko.Brain = seuraajanAivot;
+    }
+
+void törmäävät (PhysicsObject tormaaja, PhysicsObject kohde)
+{
+    tormaaja.Destroy(); 
+    kuolemaaani.Play();
+    ClearAll();
+    LuoKentta(); 
+    LisaaNappaimet();
+    Camera.Follow(pelaaja1);
+}
     private void LuoKentta()
     {
         TileMap kentta = TileMap.FromLevelAsset("kentta1.txt");
@@ -48,6 +71,7 @@ public class hyppypeli : PhysicsGame
         kentta.SetTileMethod('*', LisaaTahti);
         kentta.SetTileMethod('N', LisaaPelaaja);
         kentta.SetTileMethod('e', LisaaEste);
+        kentta.SetTileMethod('M',lisaamörkö );
         kentta.Execute(RUUDUN_KOKO, RUUDUN_KOKO);
         Level.CreateBorders();
         Level.Background.CreateGradient(Color.White, Color.SkyBlue);
@@ -63,11 +87,9 @@ public class hyppypeli : PhysicsGame
 
         Add(este);
     }
-    {
-    PhysicsObject morko = new PhysicsObject(40, 20);
-    morko.Shape = morkokuva; 
-    morko.Color = Color.Black;
-}
+   
+    
+
 
 private void TormasiEsteeseen(PhysicsObject tormaaja, PhysicsObject kohde)
     {
@@ -107,6 +129,7 @@ private void TormasiEsteeseen(PhysicsObject tormaaja, PhysicsObject kohde)
         };
         AddCollisionHandler(pelaaja1, "tahti", TormaaTahteen);
         Add(pelaaja1);
+        AddCollisionHandler(pelaaja1, "morko" ,törmäävät);
     }
 
     private void LisaaNappaimet()
